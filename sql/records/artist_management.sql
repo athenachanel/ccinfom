@@ -1,12 +1,3 @@
-CREATE TABLE IF NOT EXISTS artist (
-    artist_id INT AUTO_INCREMENT PRIMARY KEY,
-    artist_name VARCHAR(150) NOT NULL,
-    genre VARCHAR(60) NOT NULL,
-    country VARCHAR(100) NOT NULL,
-    debut_year SMALLINT UNSIGNED NOT NULL,
-    active_status BOOLEAN NOT NULL DEFAULT TRUE
-);
-
 INSERT INTO artist (artist_name, genre, country, debut_year, active_status)
 VALUES ('Sample Artist', 'Pop', 'Philippines', 2021, TRUE);
 
