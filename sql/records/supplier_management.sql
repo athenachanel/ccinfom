@@ -1,20 +1,6 @@
-CREATE TABLE supplier (
-    supplier_id INT AUTO_INCREMENT PRIMARY KEY,
-    supplier_name VARCHAR(120) NOT NULL,
-    supplier_type ENUM(
-        'Sound System',
-        'Lighting',
-        'Stage Equipment',
-        'Transportation/Logistics',
-        'Catering'
-    ) NOT NULL,
-    contact_person VARCHAR(120) NOT NULL,
-    email_address VARCHAR(254) NOT NULL,
-    contact_number VARCHAR(30) NOT NULL,
-    business_address VARCHAR(255) NOT NULL,
-    service_fee DECIMAL(12,2) NOT NULL CHECK (service_fee >= 0),
-    supplier_status ENUM('Active', 'Inactive') NOT NULL DEFAULT 'Active'
-);
+USE concert_management;
+
+START TRANSACTION;
 
 INSERT INTO supplier (
     supplier_name, supplier_type, contact_person, email_address,
@@ -42,3 +28,15 @@ SELECT *
 FROM supplier
 WHERE supplier_type = @supplier_type
 ORDER BY supplier_name, supplier_id;
+
+DELETE FROM supplier
+WHERE supplier_id = @supplier_id
+  AND NOT EXISTS (
+      SELECT 1
+      FROM concert_supplier AS cs
+      WHERE cs.supplier_id = supplier.supplier_id
+  );
+
+SELECT ROW_COUNT() AS suppliers_deleted;
+
+ROLLBACK;
