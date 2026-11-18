@@ -1,13 +1,12 @@
+USE concert_management;
+
 SELECT * FROM venue;
 START TRANSACTION;
 
-SET @venue_id = (
-    SELECT COALESCE(MAX(venue_id), 0) + 1
-    FROM venue
-);
+INSERT INTO venue (venue_name, street_address, city, venue_capacity)
+VALUES ('Sample Concert Hall', '123 Sample Street', 'Pasay', 5000);
 
-INSERT INTO venue (venue_id, venue_name, street_address, city, venue_capacity)
-VALUES (@venue_id,'Sample Concert Hall','123 Sample Street','Pasay',5000);
+SET @venue_id = IF(ROW_COUNT() = 1, LAST_INSERT_ID(), NULL);
 
 SELECT * FROM venue
 WHERE venue_id = @venue_id;
