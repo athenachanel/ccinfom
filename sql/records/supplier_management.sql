@@ -11,11 +11,21 @@ INSERT INTO supplier (
     'Sample Business Address', 15000.00, 'Active'
 );
 
-SET @supplier_id = LAST_INSERT_ID();
+SET @supplier_id = IF(ROW_COUNT() = 1, LAST_INSERT_ID(), NULL);
 
 UPDATE supplier
-SET service_fee = 16000.00,
+SET supplier_name = 'Updated Sound Supplier',
+    supplier_type = 'Sound System',
+    contact_person = 'Updated Contact',
+    email_address = 'supplier@example.com',
+    contact_number = '09000000000',
+    business_address = 'Sample Business Address',
+    service_fee = 16000.00,
     supplier_status = 'Inactive'
+WHERE supplier_id = @supplier_id;
+
+SELECT *
+FROM supplier
 WHERE supplier_id = @supplier_id;
 
 SELECT *
@@ -32,11 +42,8 @@ ORDER BY supplier_name, supplier_id;
 DELETE FROM supplier
 WHERE supplier_id = @supplier_id
   AND NOT EXISTS (
-      SELECT 1
-      FROM concert_supplier AS cs
+      SELECT 1 FROM concert_supplier AS cs
       WHERE cs.supplier_id = supplier.supplier_id
   );
-
-SELECT ROW_COUNT() AS suppliers_deleted;
 
 ROLLBACK;
