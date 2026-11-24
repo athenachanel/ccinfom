@@ -1,6 +1,5 @@
 CREATE DATABASE IF NOT EXISTS concert_management
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE concert_management;
 
@@ -12,9 +11,7 @@ CREATE TABLE IF NOT EXISTS artist (
     debut_year YEAR,
     active_status ENUM('Active', 'Inactive')
         NOT NULL DEFAULT 'Active'
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS venue (
     venue_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -22,12 +19,8 @@ CREATE TABLE IF NOT EXISTS venue (
     street_address VARCHAR(150) NOT NULL,
     city VARCHAR(60) NOT NULL,
     venue_capacity INT NOT NULL,
-
-    CONSTRAINT chk_venue_capacity
-        CHECK (venue_capacity > 0)
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
+    CONSTRAINT chk_venue_capacity CHECK (venue_capacity > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS supplier (
     supplier_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -46,21 +39,15 @@ CREATE TABLE IF NOT EXISTS supplier (
     service_fee DECIMAL(10,2) NOT NULL,
     supplier_status ENUM('Active', 'Inactive')
         NOT NULL DEFAULT 'Active',
-
-    CONSTRAINT chk_supplier_service_fee
-        CHECK (service_fee >= 0)
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
+    CONSTRAINT chk_supplier_service_fee CHECK (service_fee >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS attendee (
     attendee_id INT AUTO_INCREMENT PRIMARY KEY,
     attendee_name VARCHAR(100) NOT NULL,
     email_address VARCHAR(100) NOT NULL,
     contact_number VARCHAR(20) NOT NULL
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS concert (
     concert_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -73,35 +60,23 @@ CREATE TABLE IF NOT EXISTS concert (
     ticket_capacity INT NOT NULL,
 
     INDEX idx_concert_date (concert_date),
+    INDEX idx_concert_artist_date (artist_id, concert_date),
+    INDEX idx_concert_venue_date (venue_id, concert_date),
 
-    INDEX idx_concert_artist_date
-        (artist_id, concert_date),
+    CONSTRAINT fk_concert_artist FOREIGN KEY (artist_id)
+        REFERENCES artist(artist_id) ON DELETE RESTRICT,
 
-    INDEX idx_concert_venue_date
-        (venue_id, concert_date),
+    CONSTRAINT fk_concert_venue FOREIGN KEY (venue_id)
+        REFERENCES venue(venue_id) ON DELETE RESTRICT,
 
-    CONSTRAINT fk_concert_artist
-        FOREIGN KEY (artist_id)
-        REFERENCES artist(artist_id)
-        ON DELETE RESTRICT,
+    CONSTRAINT chk_concert_ticket_capacity CHECK (ticket_capacity > 0),
 
-    CONSTRAINT fk_concert_venue
-        FOREIGN KEY (venue_id)
-        REFERENCES venue(venue_id)
-        ON DELETE RESTRICT,
-
-    CONSTRAINT chk_concert_ticket_capacity
-        CHECK (ticket_capacity > 0),
-
-    CONSTRAINT chk_concert_time
-        CHECK (
-            start_time >= '00:00:00'
-            AND end_time <= '23:59:59'
-            AND end_time > start_time
-        )
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
+    CONSTRAINT chk_concert_time CHECK (
+        start_time >= '00:00:00'
+        AND end_time <= '23:59:59'
+        AND end_time > start_time
+    )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS concert_supplier (
     concert_id INT NOT NULL,
@@ -109,18 +84,12 @@ CREATE TABLE IF NOT EXISTS concert_supplier (
 
     PRIMARY KEY (concert_id, supplier_id),
 
-    CONSTRAINT fk_concert_supplier_concert
-        FOREIGN KEY (concert_id)
-        REFERENCES concert(concert_id)
-        ON DELETE RESTRICT,
+    CONSTRAINT fk_concert_supplier_concert FOREIGN KEY (concert_id)
+        REFERENCES concert(concert_id) ON DELETE RESTRICT,
 
-    CONSTRAINT fk_concert_supplier_supplier
-        FOREIGN KEY (supplier_id)
-        REFERENCES supplier(supplier_id)
-        ON DELETE RESTRICT
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
+    CONSTRAINT fk_concert_supplier_supplier FOREIGN KEY (supplier_id)
+        REFERENCES supplier(supplier_id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS ticket_purchase (
     purchase_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -130,23 +99,12 @@ CREATE TABLE IF NOT EXISTS ticket_purchase (
     quantity INT NOT NULL,
     unit_price DECIMAL(10,2) NOT NULL,
 
-    CONSTRAINT fk_ticket_purchase_concert
-        FOREIGN KEY (concert_id)
-        REFERENCES concert(concert_id)
-        ON DELETE RESTRICT,
+    CONSTRAINT fk_ticket_purchase_concert FOREIGN KEY (concert_id)
+        REFERENCES concert(concert_id) ON DELETE RESTRICT,
 
-    CONSTRAINT fk_ticket_purchase_attendee
-        FOREIGN KEY (attendee_id)
-        REFERENCES attendee(attendee_id)
-        ON DELETE RESTRICT,
+    CONSTRAINT fk_ticket_purchase_attendee FOREIGN KEY (attendee_id)
+        REFERENCES attendee(attendee_id) ON DELETE RESTRICT,
 
-    CONSTRAINT chk_ticket_purchase_quantity
-        CHECK (quantity > 0),
-
-    CONSTRAINT chk_ticket_purchase_unit_price
-        CHECK (unit_price >= 0)
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_unicode_ci;
-
-SHOW TABLES;
+    CONSTRAINT chk_ticket_purchase_quantity CHECK (quantity > 0),
+    CONSTRAINT chk_ticket_purchase_unit_price CHECK (unit_price >= 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
