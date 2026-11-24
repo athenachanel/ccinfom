@@ -1,5 +1,5 @@
 USE concert_management;
-
+ 
 START TRANSACTION;
 
 INSERT INTO artist (artist_name, genre, country, debut_year, active_status)
