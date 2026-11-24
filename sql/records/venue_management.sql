@@ -1,6 +1,5 @@
 USE concert_management;
 
-SELECT * FROM venue;
 START TRANSACTION;
 
 INSERT INTO venue (venue_name, street_address, city, venue_capacity)
@@ -12,15 +11,16 @@ SELECT * FROM venue
 WHERE venue_id = @venue_id;
 
 UPDATE venue
-SET
-    venue_name = 'Sample Music Arena',
+SET venue_name = 'Sample Music Arena',
     street_address = '456 Sample Avenue',
     city = 'Pasay',
     venue_capacity = 7000
-WHERE venue_id = @venue_id;
-
-SELECT * FROM venue
-WHERE venue_id = @venue_id;
+WHERE venue_id = @venue_id
+  AND 7000 >= (
+      SELECT COALESCE(MAX(ticket_capacity), 0)
+      FROM concert
+      WHERE concert.venue_id = venue.venue_id
+  );
 
 SELECT * FROM venue
 ORDER BY venue_id;
@@ -33,9 +33,6 @@ WHERE city = @selected_city
 ORDER BY venue_name;
 
 DELETE FROM venue
-WHERE venue_id = @venue_id;
-
-SELECT * FROM venue
 WHERE venue_id = @venue_id;
 
 ROLLBACK;
