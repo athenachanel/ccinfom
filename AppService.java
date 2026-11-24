@@ -53,11 +53,12 @@ public final class AppService {
     }
 
     public Object[] record(Kind kind, int id) throws SQLException {
-            return first(DataAccess.query(kind.select() + " WHERE " + kind.id + " = ?", id));
+        return first(DataAccess.query(kind.select() + " WHERE " + kind.id + " = ?", id));
     }
 
     public List<String> filterValues(Kind kind) throws SQLException {
-        return strings("SELECT DISTINCT " + kind.filter + " FROM " + kind.table + " ORDER BY " + kind.filter);
+        return strings("SELECT DISTINCT " + kind.filter + " FROM " + kind.table +
+                " ORDER BY " + kind.filter);
     }
 
     public void saveRecord(Kind kind, Integer id, String[] input) throws SQLException {
@@ -277,7 +278,7 @@ public final class AppService {
                 AND c.concert_date >= ? AND c.concert_date < ?
                 GROUP BY v.venue_id, v.venue_name, v.city ORDER BY v.venue_name
                 """, start, end);
-            case GENRE -> DataAccess.query("""
+                case GENRE -> DataAccess.query("""
                 SELECT a.genre, COUNT(c.concert_id) AS total_concerts,
                        COUNT(DISTINCT c.artist_id) AS unique_performing_artists
                 FROM artist a LEFT JOIN concert c ON c.artist_id = a.artist_id
